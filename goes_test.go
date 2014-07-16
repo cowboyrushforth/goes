@@ -837,3 +837,80 @@ func (s *GoesTestSuite) TestAggregations(c *C) {
 	c.Assert(age["count"], Equals, 2.0)
 	c.Assert(age["sum"], Equals, 25.0+30.0)
 }
+
+func (s *GoesTestSuite) TestSuggest(c *C) {
+	indexName := "testsearch"
+	docType := "tweet"
+	docId := "1234"
+	source := map[string]interface{}{
+		"user":    "foo",
+		"message": "bar",
+                "name_suggest": map[string]interface{} {
+                  "input": []string{"foo"},
+                },
+	}
+
+	conn := NewConnection(ES_HOST, ES_PORT)
+	conn.DeleteIndex(indexName)
+
+        mappings := map[string]interface{} {
+          "mappings": map[string]interface{}{
+          "_default_": map[string]interface{}{
+            "_source": map[string]interface{}{
+              "enabled": true,
+            },
+            "_all": map[string]interface{}{
+              "enabled": false,
+            },
+          },
+          "tweet": map[string]interface{} {
+            "properties": map[string]interface{} {
+              "name_suggest" : map[string]interface{} {
+                "type" : "completion",
+              },
+            },
+          },
+        },
+      }
+
+	_, err := conn.CreateIndex(indexName, mappings)
+	c.Assert(err, IsNil)
+	defer conn.DeleteIndex(indexName)
+
+	d := Document{
+		Index:  indexName,
+		Type:   docType,
+		Id:     docId,
+		Fields: source,
+	}
+
+	_, err = conn.Index(d, url.Values{})
+	c.Assert(err, IsNil)
+
+	_, err = conn.RefreshIndex(indexName)
+	c.Assert(err, IsNil)
+
+        query := map[string]interface{}{
+          "text": "foo",
+          "completion": map[string]interface{} {
+            "field": "name_suggest",
+          },
+        }
+	response, err := conn.Suggest(query, []string{indexName}, []string{}, url.Values{})
+
+        expectedSuggestion := []Suggestion{
+          Suggestion{
+            Text:"foo", 
+            Offset:0x0, 
+            Length:0x3, 
+            Options: []SuggestionOption{
+              SuggestionOption{
+                Text:"foo", 
+                Score:1},
+              },
+            },
+          }
+
+
+	c.Assert(response.Suggestion, DeepEquals, expectedSuggestion)
+}

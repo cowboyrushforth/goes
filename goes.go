@@ -183,6 +183,23 @@ func (c *Connection) Search(query map[string]interface{}, indexList []string, ty
 	return r.Run()
 }
 
+// Suggest executes an autosuggest query against an index
+func (c *Connection) Suggest(query map[string]interface{}, indexList []string, typeList []string, extraArgs url.Values) (Response, error) {
+	r := Request{
+		Conn:      c,
+		Query:     map[string]interface{} {
+                  "suggest": query,
+                },
+		IndexList: indexList,
+		TypeList:  typeList,
+		method:    "POST",
+		api:       "_suggest",
+		ExtraArgs: extraArgs,
+	}
+
+	return r.Run()
+}
+
 // Scan starts scroll over an index
 func (c *Connection) Scan(query map[string]interface{}, indexList []string, typeList []string, timeout string, size int) (Response, error) {
 	v := url.Values{}

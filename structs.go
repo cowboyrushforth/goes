@@ -87,6 +87,9 @@ type Response struct {
 	ScrollId string `json:"_scroll_id"`
 
 	Aggregations map[string]Aggregation `json:"aggregations,omitempty"`
+
+        // Suggestions
+        Suggestion []Suggestion `json:"suggest,omitempty"`
 }
 
 // Represents an aggregation from response
@@ -153,6 +156,20 @@ type Hits struct {
 	// max_score may contain the "null" value
 	MaxScore interface{} `json:"max_score"`
 	Hits     []Hit
+}
+
+// Represent a suggestion returned by completion api
+type SuggestionOption struct {
+  Text  string  `json:"text"`
+  Score float64 `json:"score"`
+}
+
+// Represent a Suggestion response
+type Suggestion struct {
+  Text    string  `json:"text"`
+  Offset  uint64  `json:"offset"`
+  Length  uint64  `json:"length"`
+  Options []SuggestionOption `json:"options"`
 }
 
 type SearchError struct {
