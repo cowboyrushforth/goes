@@ -162,7 +162,7 @@ type Hits struct {
 type SuggestionOption struct {
   Text  string  `json:"text"`
   Score float64 `json:"score"`
-  Payload []map[string]interface{} `json:"payload"`
+  Payload map[string]interface{} `json:"payload"`
 }
 
 // Represent a Suggestion response
