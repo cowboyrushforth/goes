@@ -7,6 +7,7 @@ package goes
 import (
 	"net/http"
 	"net/url"
+        "encoding/json"
 )
 
 // Represents a Connection object to elasticsearch
@@ -79,6 +80,7 @@ type Response struct {
 	// Used by the GET API
 	Source map[string]interface{} `json:"_source"`
 	Fields map[string]interface{} `json:"fields"`
+        RawSource json.RawMessage `json:"_source"`
 
 	// Used by the _status API
 	Indices map[string]IndexStatus
