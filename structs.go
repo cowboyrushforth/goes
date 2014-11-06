@@ -78,7 +78,7 @@ type Response struct {
 	Items []map[string]Item `json:"items,omitempty"`
 
 	// Used by the GET API
-	Source map[string]interface{} `json:"_source"`
+	//Source map[string]interface{} `json:"_source"`
 	Fields map[string]interface{} `json:"fields"`
         RawSource json.RawMessage `json:"_source"`
 
