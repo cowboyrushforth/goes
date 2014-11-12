@@ -148,7 +148,8 @@ type Hit struct {
 	Type   string                 `json:"_type"`
 	Id     string                 `json:"_id"`
 	Score  float64                `json:"_score"`
-	Source map[string]interface{} `json:"_source"`
+	Source map[string]interface{} //`json:"_source"`
+	RawSource json.RawMessage `json:"_source"`
 	Fields map[string]interface{} `json:"fields"`
 }
 
