@@ -5,9 +5,9 @@
 package goes
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/url"
-        "encoding/json"
 )
 
 // Represents a Connection object to elasticsearch
@@ -60,6 +60,7 @@ type Request struct {
 type Response struct {
 	Acknowledged bool
 	Error        string
+	Errors       bool
 	Status       uint64
 	Took         uint64
 	TimedOut     bool  `json:"timed_out"`
@@ -70,6 +71,7 @@ type Response struct {
 	Type         string `json:"_type"`
 	Version      int    `json:"_version"`
 	Found        bool
+	Count        int
 
 	// Used by the _stats API
 	All All `json:"_all"`
@@ -79,8 +81,8 @@ type Response struct {
 
 	// Used by the GET API
 	//Source map[string]interface{} `json:"_source"`
-	Fields map[string]interface{} `json:"fields"`
-        RawSource json.RawMessage `json:"_source"`
+	Fields    map[string]interface{} `json:"fields"`
+	RawSource json.RawMessage        `json:"_source"`
 
 	// Used by the _status API
 	Indices map[string]IndexStatus
@@ -90,8 +92,9 @@ type Response struct {
 
 	Aggregations map[string]Aggregation `json:"aggregations,omitempty"`
 
-        // Suggestions
-        Suggestion []Suggestion `json:"suggest,omitempty"`
+	// Suggestions
+	Suggestion []Suggestion `json:"suggest,omitempty"`
+	Raw        map[string]interface{}
 }
 
 // Represents an aggregation from response
@@ -107,7 +110,7 @@ type Document struct {
 	Type        string
 	Id          interface{}
 	BulkCommand string
-	Fields      map[string]interface{}
+	Fields      interface{}
 }
 
 // Represents the "items" field in a _bulk response
@@ -116,6 +119,8 @@ type Item struct {
 	Id      string `json:"_id"`
 	Index   string `json:"_index"`
 	Version int    `json:"_version"`
+	Error   string `json:"error"`
+	Status  uint64 `json:"status"`
 }
 
 // Represents the "_all" field when calling the _stats API
@@ -144,13 +149,14 @@ type Shard struct {
 
 // Represent a hit returned by a search
 type Hit struct {
-	Index  string                 `json:"_index"`
-	Type   string                 `json:"_type"`
-	Id     string                 `json:"_id"`
-	Score  float64                `json:"_score"`
-	Source map[string]interface{} //`json:"_source"`
-	RawSource json.RawMessage `json:"_source"`
-	Fields map[string]interface{} `json:"fields"`
+	Index     string                 `json:"_index"`
+	Type      string                 `json:"_type"`
+	Id        string                 `json:"_id"`
+	Score     float64                `json:"_score"`
+	Source    map[string]interface{} //`json:"_source"`
+	RawSource json.RawMessage        `json:"_source"`
+	Fields    map[string]interface{} `json:"fields"`
+	Highlight map[string]interface{} `json:"highlight"`
 }
 
 // Represent the hits structure as returned by elasticsearch
@@ -163,17 +169,17 @@ type Hits struct {
 
 // Represent a suggestion returned by completion api
 type SuggestionOption struct {
-  Text  string  `json:"text"`
-  Score float64 `json:"score"`
-  Payload map[string]interface{} `json:"payload"`
+	Text    string                 `json:"text"`
+	Score   float64                `json:"score"`
+	Payload map[string]interface{} `json:"payload"`
 }
 
 // Represent a Suggestion response
 type Suggestion struct {
-  Text    string  `json:"text"`
-  Offset  uint64  `json:"offset"`
-  Length  uint64  `json:"length"`
-  Options []SuggestionOption `json:"options"`
+	Text    string             `json:"text"`
+	Offset  uint64             `json:"offset"`
+	Length  uint64             `json:"length"`
+	Options []SuggestionOption `json:"options"`
 }
 
 type SearchError struct {
