@@ -94,7 +94,7 @@ func (c *Connection) IndexStatus(indexList []string) (Response, error) {
 		Conn:      c,
 		IndexList: indexList,
 		method:    "GET",
-		api:       "_status",
+		api:       "_recovery",
 	}
 
 	return r.Run()
@@ -186,10 +186,10 @@ func (c *Connection) Search(query map[string]interface{}, indexList []string, ty
 // Suggest executes an autosuggest query against an index
 func (c *Connection) Suggest(query map[string]interface{}, indexList []string, typeList []string, extraArgs url.Values) (Response, error) {
 	r := Request{
-		Conn:      c,
-		Query:     map[string]interface{} {
-                  "suggest": query,
-                },
+		Conn: c,
+		Query: map[string]interface{}{
+			"suggest": query,
+		},
 		IndexList: indexList,
 		TypeList:  typeList,
 		method:    "POST",
